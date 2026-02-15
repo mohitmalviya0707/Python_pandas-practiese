@@ -15,3 +15,38 @@ users_pages
 Expected Output Type
 
 pandas.DataFrame
+
+
+
+solution ---------------------------------------------
+# Import your libraries
+import pandas as pd
+
+# Start writing code
+users_friends.head()
+
+# Step 1: Friends ke pages nikalo
+friends_pages = users_friends.merge(
+    users_pages,
+    left_on='friend_id',
+    right_on='user_id'
+)
+
+# Step 2: Clean columns
+friends_pages = friends_pages[['user_id_x', 'page_id']]
+friends_pages.columns = ['user_id', 'page_id']
+
+# Step 3: Remove pages already followed by user
+result = friends_pages.merge(
+    users_pages,
+    on=['user_id', 'page_id'],
+    how='left',
+    indicator=True
+)
+
+result = result[result['_merge'] == 'left_only']
+
+# Step 4: Final output
+result = result[['user_id', 'page_id']].drop_duplicates()
+
+result
