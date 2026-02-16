@@ -1,0 +1,26 @@
+((((((((((((((((((((((((((((((((((((((((((((
+Best Selling Item
+
+Hard
+ID 10172
+
+
+Find the best-selling item for each month (no need to separate months by year). The best-selling item is determined by the highest total sales amount, calculated as: total_paid = unitprice * quantity. A negative quantity indicates a return or cancellation (the invoice number begins with 'C'. To calculate sales, ignore returns and cancellations. Output the month, description of the item, and the total amount paid.
+DataFrame
+
+online_retail
+Expected Output Type
+
+pandas.DataFrame))))))))))))))))))))))))))))))))))))
+
+solution ------------------
+import pandas as pd
+
+online_retail = online_retail[online_retail['quantity'] > 0].copy()
+online_retail['month'] = pd.to_datetime(online_retail['invoicedate']).dt.month
+online_retail['paid'] = online_retail['unitprice'] * online_retail['quantity']
+online_retail['total_paid'] = online_retail.groupby(['month', 'description'])['paid'].transform('sum')
+
+result = online_retail[['month', 'total_paid', 'description']].drop_duplicates()
+result['rnk'] = result.groupby('month')['total_paid'].rank(method='max', ascending=False)
+result = result[result['rnk'] == 1][['month', 'description', 'total_paid']].sort_values('month')
